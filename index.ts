@@ -11,7 +11,7 @@ interface teacherList{
     name:string,
     id:number,
     email:string,
-    subject:string,
+    subject:string|undefined,
     role:string,
 }
 //Create a Bas Class
@@ -87,29 +87,34 @@ let persRole = "user";
 let admins = "admin";
 let teacherId:number = Math.floor(Math.random() * 90000) + 10000;
 let teacherList:teacherList[] = [
-    {name:"Tom",
+    {
         id:teacherId+1,
+        name:"Tom",
         email:"tom@gmail.com",
         subject:"Computer Science",
         role:"user"
     },
-    {name:"Ben",
+    {
         id:teacherId+2,
+        name:"Ben",
         email:"ben@gmail.com",
         subject:"Engineering",
         role:"user"
-    },{name:"Scarlett",
+    },{
         id:teacherId+3,
+        name:"Scarlett",
         email:"scarlett@gmail.com",
         subject:"Software Engineering",
         role:"admin"
-    },{name:"Evan",
+    },{
         id:teacherId+4,
+        name:"Evan",
         email:"evan@gmail.com",
         subject:"Pharmacy",
         role:"user"
-    },{name:"Tony",
+    },{
         id:teacherId+5,
+        name:"Tony",
         email:"tony@gmail.com",
         subject:"Msc in Mathematics",
         role:"user"
@@ -118,7 +123,8 @@ let teacherList:teacherList[] = [
 let ourTeachers = new Teacher("Teacher Staff");
 Teacher.teacherList = teacherList;
 //Subjects
-let subjects = ["Computer Science","Engineering","Software Engineering","Pharmacy","Msc in Mathametics"]
+let subjectList = ["Computer Science","Engineering","Software Engineering","Pharmacy","Msc in Mathametics"];
+let subjects = [... new Set(subjectList)];
 while(isCond){
     let universityOptin = await inquirer.prompt([
         {name:"UniversityOption",message:"please Select only One", type:"list",choices:["Enroll Student","Select Teacher","Visit of Department","University"]},
@@ -209,15 +215,34 @@ while(isCond){
             let filtSubject = subjects.find((e) => e.trim() === filtStudId?.subject.trim());
             console.log(filtSubject);
            if(filtStudId){
+            let availableTeachr = teacherList.filter((e) => {
+                return e.subject === filtSubject;
+            });
+            let findTechrSubject = availableTeachr.find((e) => e.subject === filtSubject);
+            let replceTeacherId = Math.floor(Math.random() * 90000) + 10000;
+            if(!findTechrSubject?.subject){
+                let filtTeacher = teacherList.filter((e) => {
+                    return e.subject !== filtSubject;
+                })
+                filtTeacher.push({name:"Sam",
+                    id:replceTeacherId,
+                    email:"sam@gmail.com",
+                    subject:filtSubject,
+                    role:"user"});
+                teacherList = filtTeacher;
+                Teacher.teacherList = teacherList;
+            }
              let slectTeacher = await inquirer.prompt([
                 {name:"teacher",message:() => {
                     for(let i=0; i<subjects.length; i++){
-                        if(filtSubject?.trim().toLowerCase() === teacherList[i].subject.trim().toLowerCase()){
+                        if(filtSubject?.trim().toLowerCase() === teacherList[i].subject?.trim().toLowerCase()){
                             return `Teacher of ${filtSubject} is ${teacherList[i].name}.`;
-                        };
+                        }else{
+                            return `Teacher of ${filtSubject} is Sam`;
+                        }
                     };
                 },
-                type:"list", choices:["Tom","Ben","Scarlett","Evan","Tony"],
+                type:"list", choices:teacherList.map((e) => e.name),
             },
             ]);
             let {studentId,name,email,subject}= filtStudId;
@@ -250,9 +275,10 @@ while(isCond){
                     let checkIdAdmin = await inquirer.prompt([
                         {name:"adminFind",message:"Enter your ID for if you are admin or not",type:"number"},
                     ]);
-                    let findAdmin = Teacher.teacherList.find((e) => e.id === checkIdAdmin.adminFind);
-                    console.log(findAdmin?.role)
-                    if(findAdmin?.id){
+                    let findAdmin = Teacher.teacherList.find((e) => e.role === admins);
+                    console.log(findAdmin?.role);
+                    // let findAdminID = Teacher.teacherList.find((e) => e.id === findAdmin?.id);
+                    if(findAdmin?.id === checkIdAdmin.adminFind){
                         let addTeacher =  await inquirer.prompt([
                             {name:"techrName",messgae:"Enter a Teacher Name",type:"string"},
                             {name:"techrEmail",message:"ENter a Teacher Email",type:"string"},
@@ -260,14 +286,14 @@ while(isCond){
                         ]);
                         let newTeacherID = Math.floor(Math.random() * 90000) + 10000;
                         let duplicateTeacherID = Teacher.teacherList.find((e) => e.id === newTeacherID);
-                let duplicateTeacherEmail = studList.find((e) => {
+                let duplicateTeacherEmail = teacherList.find((e) => {
                     return e.email === addTeacher.techrEmail;
                 });
 
                         if(duplicateTeacherID?.id){
                             console.log(`ID ${newTeacherID} is already exist, Please add a Teacher Again.`);
                         }else{
-                            if(duplicateTeacherEmail){
+                            if(duplicateTeacherEmail?.email){
                                 console.log(`Email : ${addTeacher.techrEmail}, is already exist. Please fill the form again with new Email`);
                             }else{
                                 if(addTeacher.techrName === "" || (addTeacher.techrName as string).length<3){
@@ -278,17 +304,46 @@ while(isCond){
                                     }else{
                                         let {techrName,techrEmail,techrSubject} = addTeacher;
                                         Department.addStudent(techrName,techrEmail,newTeacherID,techrSubject,persRole);
+                                        subjectList.push(techrSubject);
                                     }
                                 }
                             }
-                            if(addTeacher.techrName !== "" && (addTeacher.techrName as string).length >=3&&(addTeacher.techrEmail as string).match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/)){
+                            if(addTeacher.techrName !== "" && (addTeacher.techrName as string).length >=3&&(addTeacher.techrEmail as string).match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/)&& !duplicateTeacherEmail){
                                 console.log(`Dear ${addTeacher.techrName}, Your ID is ${newTeacherID}`);
                             }
                         }
                     }else{
-                        console.log(`this ID ${checkIdAdmin.adminFind} is not an Admin ID.`)
+                        console.log(`ID ${checkIdAdmin.adminFind} is not an Admin ID only Admin can Add a Teacher.`)
                     };
 
+                }else if(deparmntOption.departmentOption === "Remove Teacher"){
+                    let findAdminForRemTechr = await inquirer.prompt([
+                        {name:"findAdmin",message:"Enter your ID for if you are admin or not",type:"number"},
+                    ]);
+                    let findAdminRem = Teacher.teacherList.find((e) => e.role === admins);
+                    console.log(findAdminRem?.role);
+                    // let findAdmnId = Teacher.teacherList.find((e) => e.id === findAdminRem?.id);
+                    let {findAdmin} = findAdminForRemTechr;
+                    if(findAdminRem?.id === findAdmin){
+                        let removeTeacher =  await  inquirer.prompt([
+                            {name:"teacherRem",message:"Enter a Teacher ID for remove a Teacher:",type:"number"},
+                        ]);
+                        let {teacherRem} = removeTeacher;
+                        let findId = Teacher.teacherList.find((e) => e.id === teacherRem);
+                        if(findId?.id){
+                            let filterTeacherList= Teacher.teacherList.filter((e) => {
+                                return e.id !== findId.id;
+                            });
+                            console.log(`Dear Students, Teacher ${findId.name} is Remove.`);
+                            Teacher.teacherList = filterTeacherList;
+                        }else{
+                            console.log(`ID:${teacherRem}is not Available.`);
+                        }
+                        
+                    }else{
+                        console.log(`ID: ${findAdmin} is not an Admin ID only Admin can Remove a Teacher.`)
+                    }
+                    
                 }
                 let runMoreDepart = await inquirer.prompt([
                     {name:"runMore",message:"Do you want to run more the department",type:"confirm"},
