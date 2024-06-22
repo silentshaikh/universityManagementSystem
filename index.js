@@ -32,12 +32,12 @@ class Student extends Person {
     static showStudent() {
         this.studList.forEach((e, i) => {
             if (e.teacher) {
-                console.log(`Congratulation ${e.name}, You are Enrolled in the Course`),
-                    console.log(`\n ${i + 1}) \n Student Name: ${e.name}.\n Student Email: ${e.email}.\n Student ID: ${e.studentId}.\n Student Role: ${e.role} \n Course: ${e.subject}.\n Teacher: ${e.teacher}.`);
+                console.log(chalk.greenBright(`\n\tCongratulation ${chalk.italic(e.name)}, You are Enrolled in the Course\n`)),
+                    console.log(`\n ${i + 1}) \n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)}.\n Student ID: ${chalk.italic(e.studentId)}.\n Student Role: ${chalk.italic(e.role)} \n Course: ${chalk.italic(e.subject)}.\n Teacher: ${chalk.italic(e.teacher)}.`);
             }
             else {
-                console.log(`Dear ${e.name}, You are not Enrolled in the Course,Because you can't select your Teacher, Plz select your Teacher`),
-                    console.log(`\n Student Name: ${e.name}.\n Student Email: ${e.email}.\n Student ID: ${e.studentId}.\n Course: ${e.subject}.`);
+                console.log(chalk.red(`Dear ${chalk.italic(e.name)}, You are not Enrolled in the Course,Because you can't select your Teacher, Plz select your Teacher`)),
+                    console.log(` \n ${chalk.cyanBright(i + 1)})\n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)}.\n Student ID: ${chalk.italic(e.studentId)}.\n Course: ${chalk.italic(e.subject)}\n Student Role: ${chalk.italic(e.role)}.`);
             }
         });
     }
@@ -50,7 +50,7 @@ class Teacher extends Person {
     }
     static showTeachers() {
         this.teacherList.forEach((e, i) => {
-            console.log(`\n ${i + 1}) \n Teacher Name: ${e.name}.\n Teacher Email: ${e.email}.\n Teacher ID: ${e.id}.\n Teacher Subject: ${e.subject} \n Role: ${e.role}.`);
+            console.log(`\n ${chalk.cyanBright(i + 1)}) \n Teacher Name: ${chalk.italic(e.name)}.\n Teacher Email: ${chalk.italic(e.email)}.\n Teacher ID: ${chalk.italic(e.id)}.\n Teacher Subject: ${chalk.italic(e.subject)} \n Role: ${chalk.italic(chalk.greenBright(e.role))}.`);
         });
     }
 }
@@ -73,7 +73,6 @@ class Department extends Person {
 let isCond = true;
 //Declare a Variable for Enroll Student Inquirer
 let userInput;
-let studList = [];
 //Declare a Variable for instance of a Student Class
 let ourStudent;
 let persRole = "user";
@@ -131,12 +130,6 @@ let subjectList = [
 ];
 //Remove Duplicate from the List of Subjects
 let subjects = [...new Set(subjectList)];
-//filter Teacher List
-let filtTeacher = [];
-//Filter Subject
-let filtSubject = "";
-//check teacher in | out
-let findTechrSubject;
 while (isCond) {
     let universityOptin = await inquirer.prompt([
         //University OPtions
@@ -175,46 +168,45 @@ while (isCond) {
             //Create an instance of Student Object
             ourStudent = new Student(userInput.studentName, userInput.studentEmail, numToStr, userInput.courseList);
             //Find Duplicate ID
-            let notDuplicateId = studList.find((e) => {
+            let notDuplicateId = Student.studList.find((e) => {
                 return e.studentId === numToStr;
             });
             //Find Duplicate Email
-            let notDuplicateEmail = studList.find((e) => {
+            let notDuplicateEmail = Student.studList.find((e) => {
                 return e.email === userInput.studentEmail;
             });
-            console.log(notDuplicateEmail?.email);
             //Catch Duplicate ID
             if (notDuplicateId?.studentId) {
-                console.log(`This ${numToStr} Id  is already exist Please Fill the form again`);
+                console.log(chalk.red(chalk.italic(` \n\t This ${chalk.cyanBright(numToStr)} ID  is already exist Please Fill the form again\n`)));
             }
             else {
                 //Catch Duplicate Email
                 if (notDuplicateEmail?.email) {
-                    console.log(`Email : ${userInput.studentEmail}, is already exist. Please fill the form again with new Email`);
+                    console.log(chalk.red(chalk.italic(`\n\t Email : ${chalk.cyanBright(userInput.studentEmail)} , is already exist. Please fill the form again with new Email\n`)));
                 }
                 else {
                     //if name syntax is incorrect
                     if (userInput.studentName === "" ||
                         userInput.studentName.length < 3) {
-                        console.log("Please Enter Your Name and fill the form again and the must be 3 character");
+                        console.log(chalk.red(chalk.italic("\n\t Please Enter Your Name and fill the form again and the must be 3 character\n")));
                     }
                     else {
                         //if email syntax is incorrect
                         if (!userInput.studentEmail.match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/)) {
-                            console.log(`Dear ${userInput.studentName}, Please Enter a Correct Email and fill the form again.`);
+                            console.log(chalk.italic(chalk.red(`\n\t Dear ${chalk.cyanBright(userInput.studentName)}, Please Enter a Correct Email and fill the form again.\n`)));
                         }
                         else {
                             let { name, email, studentId, subject } = ourStudent;
                             //Enroll Student
                             Student.enrollStudent(name, email, studentId, persRole, subject);
-                            studList = Student.studList;
+                            // studList = Student.studList;
                         }
                     }
                     //show ID of Student if name and email syntax is correct 
                     if (userInput.studentName !== "" &&
                         userInput.studentName.length >= 3 &&
                         userInput.studentEmail.match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/)) {
-                        console.log(`Dear ${userInput.studentName}, Your ID is ${numToStr}`);
+                        console.log(chalk.italic(chalk.greenBright(`\n\t Dear ${chalk.cyanBright(userInput.studentName)}, Your ID is ${chalk.cyanBright(numToStr)}.\n`)));
                     }
                 }
             }
@@ -233,9 +225,9 @@ while (isCond) {
     else if (universityOptin.UniversityOption === "Select Teacher") {
         isCond = true;
         if (Student.studList.length === 0) {
-            console.log(chalk.red("\n##########################\n"));
-            console.log(chalk.red("# STUDENT LIST IS EMPTY #"));
-            console.log(chalk.red("\n##########################\n"));
+            console.log(chalk.red("\n\t ########################## \n"));
+            console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+            console.log(chalk.red("\n\t ########################## \n"));
         }
         else {
             while (isCond) {
@@ -248,14 +240,13 @@ while (isCond) {
                     },
                 ]);
                 //Find Student
-                let filtStudId = studList.find((e) => e.studentId === studId.id);
+                let filtStudId = Student.studList.find((e) => e.studentId === studId.id);
                 if (filtStudId?.teacher) {
-                    console.log(`You already select your Teacher, so you can't be again`);
+                    console.log(chalk.red(chalk.italic(`\n \tYou already select your Teacher, so you can't be again\n`)));
                 }
                 else {
                     //Find Subject of Student
-                    filtSubject = subjects.find((e) => e.trim() === filtStudId?.subject.trim());
-                    console.log(filtSubject);
+                    let filtSubject = subjects.find((e) => e.trim() === filtStudId?.subject.trim());
                     let findTeacher = Teacher.teacherList.find((e) => e.subject === filtSubject);
                     //if Student ID is Available
                     if (filtStudId?.studentId) {
@@ -265,7 +256,7 @@ while (isCond) {
                         if (findTeacher) {
                             //Student Teacher equal to teacher name
                             filtStudId.teacher = findTeacher.name;
-                            console.log(`\n Dear ${filtStudId.name},Your Teacher is ${findTeacher.name} for subject ${filtStudId.subject}.\n`);
+                            console.log(chalk.italic(chalk.greenBright(`\n \t Dear ${chalk.cyanBright(filtStudId.name)},Your Teacher is ${chalk.cyanBright(findTeacher.name)} for subject ${chalk.cyanBright(filtStudId.subject)}.\n`)));
                         }
                         else {
                             //replace the last remove teacher
@@ -278,12 +269,12 @@ while (isCond) {
                             Teacher.teacherList.push(newTeacher);
                             //Student Teacher equal to teacher name
                             filtStudId.teacher = newTeacher.name;
-                            console.log(`\n Dear ${filtStudId.name},Your Teacher is ${newTeacher.name} for subject ${filtStudId.subject}.\n`);
+                            console.log(chalk.italic(chalk.greenBright(`\n \t Dear ${chalk.cyanBright(filtStudId.name)},Your Teacher is ${chalk.cyanBright(newTeacher.name)} for subject ${chalk.cyanBright(filtStudId.subject)}.\n`)));
                         }
                     }
                     else {
                         //if Student ID is not available
-                        console.log(`ID: ${studId.id} is not available,Please Enter a Correct ID Again`);
+                        console.log(chalk.red(chalk.italic(`\n\tID: ${chalk.cyanBright(studId.id)} is not available,Please Enter a Correct ID Again\n`)));
                     }
                 }
                 //if Add More Student
@@ -299,6 +290,8 @@ while (isCond) {
         }
     }
     else if (universityOptin.UniversityOption === "Visit of Department") {
+        //Instance of Department
+        let ourDeparment = new Department("Department");
         isCond = true;
         while (isCond) {
             //Option of Department
@@ -318,22 +311,22 @@ while (isCond) {
             ]);
             if (deparmntOption.departmentOption === "Student List") {
                 if (Student.studList.length === 0) {
-                    console.log(chalk.red("\n##########################\n"));
-                    console.log(chalk.red("# STUDENT LIST IS EMPTY #"));
-                    console.log(chalk.red("\n##########################\n"));
+                    console.log(chalk.red("\n \t##########################\n"));
+                    console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+                    console.log(chalk.red("\n\t##########################\n"));
                 }
                 else {
                     //Show the List of Teacher
-                    console.log(`\n ### LIST OF STUDENT ###\n`);
+                    console.log(chalk.italic(chalk.greenBright(`\n \t ### LIST OF STUDENT ###\n`)));
                     Student.showStudent();
-                    console.log(`\n ### END ###\n`);
+                    console.log(chalk.greenBright(chalk.italic(`\n \t ### END ###\n`)));
                 }
             }
             else if (deparmntOption.departmentOption === "Teacher List") {
                 //Show the List of Teacher
-                console.log(`\n ### LIST OF tEACHER ### \n`);
+                console.log(chalk.greenBright(chalk.italic(`\n \t ### LIST OF tEACHER ### \n`)));
                 Teacher.showTeachers();
-                console.log(`\n ### END ### \n`);
+                console.log(chalk.greenBright(chalk.italic(`\n ### END ### \n`)));
             }
             else if (deparmntOption.departmentOption === "Add Teacher") {
                 //Using Inquirer to Find Admin
@@ -346,7 +339,6 @@ while (isCond) {
                 ]);
                 //Find Admin
                 let findAdmin = Teacher.teacherList.find((e) => e.role === admins);
-                console.log(findAdmin?.role);
                 //check the person is Admin
                 if (findAdmin?.id === checkIdAdmin.adminFind) {
                     // Add a Teacher
@@ -358,7 +350,7 @@ while (isCond) {
                         },
                         {
                             name: "techrEmail",
-                            message: "ENter a Teacher Email",
+                            message: "Enter a Teacher Email",
                             type: "string",
                         },
                         {
@@ -377,23 +369,23 @@ while (isCond) {
                     });
                     //Catch Duplicate ID
                     if (duplicateTeacherID?.id) {
-                        console.log(`ID ${strTechrID} is already exist, Please add a Teacher Again.`);
+                        console.log(chalk.italic(chalk.red(`\n\tID ${chalk.cyanBright(strTechrID)} is already exist, Please add a Teacher Again.\n`)));
                     }
                     else {
                         //Catch Duplicate Email
                         if (duplicateTeacherEmail?.email) {
-                            console.log(`Email : ${addTeacher.techrEmail}, is already exist. Please fill the form again with new Email`);
+                            console.log(chalk.italic(chalk.red(`\n\tEmail : ${chalk.cyanBright(addTeacher.techrEmail)}, is already exist. Please fill the form again with new Email.\n`)));
                         }
                         else {
                             //if name syntax is incorrect
                             if (addTeacher.techrName === "" ||
                                 addTeacher.techrName.length < 3) {
-                                console.log(`Please Enter The  Name of Teacher and fill the form again and the must be 3 character`);
+                                console.log(chalk.italic(chalk.red(`\n\tPlease Enter The  Name of Teacher and fill the form again and the must be 3 character.\n`)));
                             }
                             else {
                                 //if email syntax is incorrect
                                 if (!addTeacher.techrEmail.match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/)) {
-                                    console.log(`Dear ${addTeacher.techrName}, Please Enter a Correct Email and fill the form again.`);
+                                    console.log(chalk.italic(chalk.red(`\n\tDear ${chalk.cyanBright(addTeacher.techrName)}, Please Enter a Correct Email and fill the form again.\n`)));
                                 }
                                 else {
                                     let { techrName, techrEmail, techrSubject } = addTeacher;
@@ -408,13 +400,13 @@ while (isCond) {
                             addTeacher.techrName.length >= 3 &&
                             addTeacher.techrEmail.match(/^([a-z_0-9]+)@([a-z]+)\.([a-z]){2,7}$/) &&
                             !duplicateTeacherEmail) {
-                            console.log(`Dear ${addTeacher.techrName}, Your ID is ${strTechrID}`);
+                            console.log(chalk.greenBright(chalk.italic(`\n\tDear ${chalk.cyanBright(addTeacher.techrName)}, Your ID is ${chalk.cyanBright(strTechrID)}\n`)));
                         }
                     }
                 }
                 else {
                     //if ID is not an Admin ID
-                    console.log(`ID ${checkIdAdmin.adminFind} is not an Admin ID only Admin can Add a Teacher.`);
+                    console.log(chalk.italic(chalk.red(`\n\tID ${chalk.cyanBright(checkIdAdmin.adminFind)} is not an Admin ID only Admin can Add a Teacher.\n`)));
                 }
             }
             else if (deparmntOption.departmentOption === "Remove Teacher") {
@@ -428,7 +420,6 @@ while (isCond) {
                 ]);
                 //Find Admin in Teacher List
                 let findAdminRem = Teacher.teacherList.find((e) => e.role === admins);
-                console.log(findAdminRem?.role);
                 let { findAdmin } = findAdminForRemTechr;
                 //check admin id is equal to inquirer id
                 if (findAdminRem?.id === findAdmin) {
@@ -444,7 +435,7 @@ while (isCond) {
                     let findId = Teacher.teacherList.find((e) => e.id === teacherRem);
                     //find id equal to admin id
                     if (findId?.id === findAdmin) {
-                        console.log(`\n Admin can't be removed.\n`);
+                        console.log(chalk.italic(chalk.red(`\n\t Admin can't be removed.\n`)));
                     }
                     else {
                         //check if Teacher ID is Available
@@ -453,26 +444,26 @@ while (isCond) {
                             let filterTeacherList = Teacher.teacherList.filter((e) => {
                                 return e.id !== findId.id;
                             });
-                            console.log(`Dear Students, Teacher ${findId.name} is Remove.`);
+                            console.log(chalk.italic(chalk.cyanBright(`\n \tDear Students, Teacher ${chalk.greenBright(findId.name)} is Remove.\n`)));
                             //update the teacher list in class teacher on delete a Teacher
                             Teacher.teacherList = filterTeacherList;
                         }
                         else {
                             //if ID is not avaiable in Teacher List
-                            console.log(`ID:${teacherRem}is not Available.`);
+                            console.log(chalk.italic(chalk.red(`\n\tID:${teacherRem}is not Available.\n`)));
                         }
                     }
                 }
                 else {
                     //if ID not an Admin ID
-                    console.log(`ID: ${findAdmin} is not an Admin ID only Admin can Remove a Teacher.`);
+                    console.log(chalk.italic(chalk.red(`\n \tID: ${findAdmin} is not an Admin ID only Admin can Remove a Teacher.\n`)));
                 }
             }
             else if (deparmntOption.departmentOption === "Remove Student") {
                 if (Student.studList.length === 0) {
-                    console.log(chalk.red("\n##########################\n"));
-                    console.log(chalk.red("# STUDENT LIST IS EMPTY #"));
-                    console.log(chalk.red("\n##########################\n"));
+                    console.log(chalk.red("\n\t##########################\n"));
+                    console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+                    console.log(chalk.red("\n\t##########################\n"));
                 }
                 else {
                     //Find Admin to Remove a Student
@@ -485,7 +476,6 @@ while (isCond) {
                     ]);
                     //Find Admin in Teacher List
                     let findAdminStud = Teacher.teacherList.find((e) => e.role === admins);
-                    console.log(findAdminStud?.role);
                     let { findAdmin } = findAdminForRemStud;
                     // if Inquirer id is equal to Admin ID
                     if (findAdmin === findAdminStud?.id) {
@@ -506,17 +496,17 @@ while (isCond) {
                                 return e.studentId !== findStudId.studentId;
                             });
                             //Message if Student is remove 
-                            console.log(`Student ${findStudId.name} is Remove`);
+                            console.log(chalk.cyan(`\n\tStudent ${findStudId.name} is Remove\n`));
                             Student.studList = filterStud;
                         }
                         else {
                             //if Student ID is not available
-                            console.log(`ID: ${studentRem} is not Available.`);
+                            console.log(chalk.red(chalk.italic(`ID: ${chalk.cyanBright(studentRem)} is not Available.`)));
                         }
                     }
                     else {
                         //if Id not an Admin ID
-                        console.log(`ID : ${findAdmin} is not an Admin ID`);
+                        console.log(chalk.italic(chalk.red(`ID : ${chalk.cyanBright(findAdmin)} is not an Admin ID`)));
                     }
                 }
             }
