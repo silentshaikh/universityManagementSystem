@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 import inquirer from "inquirer";
 import chalk from "chalk"; 
 //Create an interface of TStudent list
@@ -54,14 +55,14 @@ class Student extends Person {
             if(e.teacher){
                 console.log(chalk.greenBright(`\n\tCongratulation ${chalk.italic(e.name)}, You are Enrolled in the Course\n`)),
             console.log(
-                `\n ${i + 1}) \n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)
-                }.\n Student ID: ${chalk.italic(e.studentId)}.\n Student Role: ${chalk.italic(e.role)} \n Course: ${chalk.italic(e.subject)
+                `\n ${chalk.cyanBright(i + 1)}) \n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)
+                }.\n Student ID: ${chalk.italic(e.studentId)}.\n Student Role: ${chalk.italic(chalk.greenBright(e.role))} \n Course: ${chalk.italic(e.subject)
                 }.\n Teacher: ${chalk.italic(e.teacher)}.`
             );
             }else{
                 console.log(chalk.red(`Dear ${chalk.italic(e.name)}, You are not Enrolled in the Course,Because you can't select your Teacher, Plz select your Teacher`)),
 
-                console.log(` \n ${chalk.cyanBright(i + 1)})\n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)}.\n Student ID: ${chalk.italic(e.studentId)}.\n Course: ${chalk.italic(e.subject)}\n Student Role: ${chalk.italic(e.role)}.`);
+                console.log(` \n ${chalk.cyanBright(i + 1)})\n Student Name: ${chalk.italic(e.name)}.\n Student Email: ${chalk.italic(e.email)}.\n Student ID: ${chalk.italic(e.studentId)}.\n Course: ${chalk.italic(e.subject)}\n Student Role: ${chalk.italic(chalk.greenBright(e.role))}.`);
             }
         });
     }
@@ -166,6 +167,10 @@ let subjectList: string[] = [
 ];
 //Remove Duplicate from the List of Subjects
 let subjects:string[] = [...new Set(subjectList)];
+console.log(chalk.greenBright(`\t/---------------------------------------------/`));
+console.log(chalk.italic(chalk.greenBright(`\n\t\t WELCOME TO`)));
+console.log(chalk.italic(chalk.greenBright(`\n\t\t UNIVERSITY MANAGEMENT SYSTEM`)));
+console.log(chalk.greenBright(`\n\t/---------------------------------------------/`));
 while (isCond) {
     let universityOptin = await inquirer.prompt([
         //University OPtions
@@ -282,7 +287,7 @@ while (isCond) {
         isCond = true;
         if(Student.studList.length === 0){
             console.log(chalk.red("\n\t ########################## \n"));
-    console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+    console.log(chalk.red(chalk.italic("\t# STUDENT LIST IS EMPTY #")));
   console.log(chalk.red("\n\t ########################## \n"));
         }else{
         while (isCond) {
@@ -370,7 +375,7 @@ while (isCond) {
             if (deparmntOption.departmentOption === "Student List") {
                 if(Student.studList.length === 0){
                     console.log(chalk.red("\n \t##########################\n"));
-      console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+      console.log(chalk.red(chalk.italic("\t# STUDENT LIST IS EMPTY #")));
       console.log(chalk.red("\n\t##########################\n"));
 
                 }else{
@@ -540,7 +545,7 @@ while (isCond) {
             }else if(deparmntOption.departmentOption === "Remove Student"){
                 if(Student.studList.length === 0){
                     console.log(chalk.red("\n\t##########################\n"));
-                    console.log(chalk.red("\t# STUDENT LIST IS EMPTY #"));
+                    console.log(chalk.red(chalk.italic("\t# STUDENT LIST IS EMPTY #")));
                     console.log(chalk.red("\n\t##########################\n"));
                 }else{
                     //Find Admin to Remove a Student
@@ -573,7 +578,7 @@ while (isCond) {
                             return e.studentId !== findStudId.studentId; 
                         });
                         //Message if Student is remove 
-                        console.log(chalk.cyan(`\n\tStudent ${findStudId.name} is Remove\n`));
+                        console.log(chalk.cyanBright(chalk.italic(`\n\tStudent ${chalk.greenBright(findStudId.name)} is Remove\n`)));
                         Student.studList = filterStud;
                     }else{
                         //if Student ID is not available
